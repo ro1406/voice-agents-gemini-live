@@ -2,7 +2,8 @@
 const $ = (id) => document.getElementById(id);
 let ws, stream, captureCtx, playCtx, player, turn;
 
-$("mic").onclick = () => (ws ? disconnect() : connect().catch((e) => showError(e.message)));
+$("mic").onclick = () => (ws ? toggleMute() : connect().catch((e) => showError(e.message)));
+$("end").onclick = () => disconnect();
 
 async function connect() {
   setStatus("connecting");
@@ -28,10 +29,20 @@ async function connect() {
 
   ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`);
   ws.binaryType = "arraybuffer";
-  ws.onopen = () => setStatus("live");
+  ws.onopen = () => setStatus($("mic").classList.contains("muted") ? "muted" : "live");
   ws.onclose = () => disconnect();
   ws.onmessage = ({ data }) => (typeof data === "string" ? handle(JSON.parse(data)) : player.port.postMessage(data, [data]));
   $("mic").classList.add("on");
+  $("end").hidden = false;
+}
+
+// A disabled mic track feeds silence, so Gemini's turn-taking still works but it can't hear the speakers.
+function toggleMute() {
+  const track = stream.getAudioTracks()[0];
+  track.enabled = !track.enabled;
+  $("mic").classList.toggle("muted", !track.enabled);
+  $("mic").textContent = track.enabled ? "🎙️" : "🔇";
+  setStatus(track.enabled ? "live" : "muted");
 }
 
 function disconnect() {
@@ -43,7 +54,9 @@ function disconnect() {
   captureCtx?.close();
   playCtx?.close();
   stream = captureCtx = playCtx = null;
-  $("mic").classList.remove("on");
+  $("mic").classList.remove("on", "muted");
+  $("mic").textContent = "🎙️";
+  $("end").hidden = true;
   $("level").style.width = "0";
   if ($("status").textContent !== "error") setStatus("idle");
 }

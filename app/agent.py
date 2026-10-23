@@ -37,26 +37,26 @@ async def run_agent(bridge: BrowserBridge) -> None:
     """Stream the guest's voice to Gemini and Gemini's voice, transcripts and tool calls back.
     
     Talk to Gemini:
-
     - send_realtime_input(audio=… / text=…): Live streaming, as it happens
-
-    - send_tool_response(): Answering a tool call
-
-    - send_client_content(): Injecting whole conversation turns, e.g. restoring history
-    
+    - send_tool_response(): Answering a tool call    
     """
     registry = ToolRegistry(settings.tool_modules, on_event=bridge.tool_event)
 
     # === LIVE CODING START ===
     async with client.aio.live.connect(model=settings.model, config=build_live_config(settings, registry)) as session:
         async def send_inputs():
+            #Send human audio to Gemini
             async for item in bridge.inputs():
                 await session.send_realtime_input(**item)
+
+
         async def answer(tool_call):
+            #Call the tool, then send the response to Gemini
             await session.send_tool_response(function_responses=await registry.run(tool_call))
 
         async def receive_replies():
-            while True:  # receive() ends after every turn
+            #In a loop - receive messages from Gemini and take actions
+            while True:
                 async for msg in session.receive():
                     await bridge.play(msg.data)
                     if msg.server_content and msg.server_content.interrupted:
@@ -65,6 +65,7 @@ async def run_agent(bridge: BrowserBridge) -> None:
                         tg.create_task(answer(msg.tool_call))  # keep audio flowing while tools run
                     await bridge.transcript(msg)
 
+        #Start the parallel tasks to listen to user and respond back
         async with asyncio.TaskGroup() as tg:
             tg.create_task(send_inputs())
             tg.create_task(receive_replies())

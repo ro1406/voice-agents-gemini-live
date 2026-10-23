@@ -104,7 +104,7 @@ TOOL_MODULES=app.tools.clinic,app.tools.call
 
 - **No mic prompt or "Permission denied".** Browsers only allow the mic on `https://` or `http://localhost`. Check the site permission next to the URL bar. If you are on a remote machine, use `localhost` port-forwarding rather than the machine's IP.
 - **Chipmunk or slow-motion audio.** Gemini expects 16 kHz 16-bit mono PCM in and sends 24 kHz out. The capture worklet resamples from your device rate, and playback runs a 24 kHz `AudioContext`. If you change either side, keep those two rates.
-- **The agent keeps interrupting itself.** It is hearing its own voice through your speakers. Wear headphones. Echo cancellation helps, but projectors and room speakers defeat it.
+- **The agent keeps interrupting itself.** It is hearing its own voice through your speakers. Wear headphones, or tap the mic button to mute while the agent talks (muting sends silence, so turn-taking still works). Echo cancellation helps, but projectors and room speakers defeat it.
 - **It cuts people off mid-sentence.** Voice activity detection ends the turn after `silence_duration_ms` of silence. That is 700 ms here; keep it between 500 and 800 ms. Lower values chop up speech, and higher values feel sluggish.
 - **The room is too noisy.** Use the text box. Typed text goes into the same session.
 - **The session ends after about 10 minutes.** See "Longer calls" above.

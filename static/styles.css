@@ -26,10 +26,13 @@ h2 { margin: 0 0 12px; font-size: 0.8rem; text-transform: uppercase; letter-spac
 .pill.live { background: var(--ok); color: white; }
 .pill.connecting { background: var(--saffron); }
 .pill.error { background: var(--bad); color: white; }
+.pill.muted { background: var(--bad); color: white; }
 .meter { width: 120px; height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; }
 #level { height: 100%; width: 0; background: var(--saffron); transition: width 80ms; }
 .mic { width: 72px; height: 72px; border-radius: 50%; border: none; font-size: 2rem; background: var(--line); cursor: pointer; }
 .mic.on { background: var(--saffron); box-shadow: 0 0 0 6px #e8a33d55; }
+.mic.muted { background: #f6d2cd; box-shadow: 0 0 0 6px #c9503f33; }
+.end { padding: 10px 16px; border: none; border-radius: 999px; background: var(--bad); color: white; font: inherit; cursor: pointer; }
 
 .error { margin: 0 24px; padding: 12px; background: #fbe4e0; color: var(--bad); border-radius: 8px; }
 
