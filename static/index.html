@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saffron Palm Front Desk</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="banner">🎧 Please use headphones, otherwise the agent hears itself and interrupts.</div>
+
+  <header>
+    <h1>The Saffron Palm <span>Dubai Marina · Front Desk</span></h1>
+    <div class="controls">
+      <span id="status" class="pill">idle</span>
+      <div class="meter"><div id="level"></div></div>
+      <button id="mic" class="mic" aria-label="Connect">🎙️</button>
+    </div>
+  </header>
+
+  <div id="error" class="error" hidden></div>
+
+  <main>
+    <section class="panel">
+      <h2>Conversation</h2>
+      <div id="transcript" class="transcript"></div>
+      <form id="text-form">
+        <input id="text" dir="auto" placeholder="Noisy room? Type here…" autocomplete="off">
+        <button>Send</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Front Desk</h2>
+      <div id="tools" class="tools"></div>
+      <h2>Bookings</h2>
+      <ul id="bookings" class="bookings"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

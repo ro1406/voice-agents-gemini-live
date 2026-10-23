@@ -1,0 +1,22 @@
+{
+  "name": "The Saffron Palm Hotel, Dubai Marina",
+  "currency": "AED",
+  "floors": 20,
+  "rooms_per_floor": 30,
+  "rooms": {
+    "standard double": {"capacity": 2, "rate": 650, "inventory": 8, "aliases": ["double", "standard", "queen"]},
+    "twin": {"capacity": 2, "rate": 650, "inventory": 6, "aliases": ["twin beds", "two beds"]},
+    "deluxe king marina view": {"capacity": 3, "rate": 950, "inventory": 4, "aliases": ["deluxe", "king", "marina view", "sea view"]},
+    "family suite": {"capacity": 5, "rate": 1650, "inventory": 2, "aliases": ["suite", "family"]}
+  },
+  "info": {
+    "check_in_out": "Check-in is from 3 PM and check-out is by 12 noon. Late check-out until 4 PM is 200 AED, subject to availability.",
+    "breakfast": "Breakfast is served at Saffron Kitchen on the ground floor, 6:30 to 10:30 AM, 95 AED per adult, children under 6 eat free.",
+    "pool": "The infinity pool is on the rooftop, level 21, open 7 AM to 10 PM. Towels are provided.",
+    "spa": "Palm Spa is on level 2, open 10 AM to 10 PM. Guests get 15 percent off treatments; booking ahead is recommended.",
+    "wifi": "Wi-Fi is free throughout the hotel. Network SaffronPalm-Guest, password is your room number and surname.",
+    "parking": "Valet parking is free for hotel guests. Self-parking is in basement levels B1 and B2.",
+    "airport_transfer": "Private airport transfer from DXB is 250 AED per car each way, about 35 minutes. Please give us your flight number a day ahead.",
+    "metro": "The nearest stop is DMCC Metro station on the Red Line, a 7 minute walk. The Dubai Marina tram stop is 3 minutes away."
+  }
+}

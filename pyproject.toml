@@ -1,0 +1,24 @@
+[project]
+name = "saffron-palm"
+version = "0.1.0"
+description = "Bilingual hotel receptionist voice agent on the Gemini Live API (GDG DevFest Dubai workshop)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "google-genai==2.31.0",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "python-dotenv>=1.0",
+    "tzdata>=2024.1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.uv]
+package = false
