@@ -1,13 +1,22 @@
 // Browser side: mic -> WebSocket -> speakers, plus transcript and Front Desk panels.
 const $ = (id) => document.getElementById(id);
-let ws, stream, captureCtx, playCtx, player, turn;
+let ws, stream, captureCtx, playCtx, player, turn, connecting, sending;
 
-$("mic").onclick = () => (ws ? toggleMute() : connect().catch((e) => showError(e.message)));
+$("mic").onclick = async () => {
+  $("mic").disabled = true;
+  try {
+    await connect();
+    if (stream) toggleMute();
+    else await startMicrophone();
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    $("mic").disabled = false;
+  }
+};
 $("end").onclick = () => disconnect();
 
-async function connect() {
-  setStatus("connecting");
-  $("error").hidden = true;
+async function startMicrophone() {
   stream = await navigator.mediaDevices.getUserMedia({
     audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
   });
@@ -21,6 +30,20 @@ async function connect() {
     $("level").style.width = `${Math.min(100, data.level * 400)}%`;
   };
 
+  $("mic").classList.add("on");
+  setStatus("live");
+}
+
+function connect() {
+  if (connecting) return connecting;
+  if (ws?.readyState === WebSocket.OPEN) return Promise.resolve();
+  connecting = startSession().finally(() => { connecting = null; });
+  return connecting;
+}
+
+async function startSession() {
+  setStatus("connecting");
+  $("error").hidden = true;
   playCtx = new AudioContext({ sampleRate: 24000 });
   await playCtx.audioWorklet.addModule("audio-worklet.js");
   player = new AudioWorkletNode(playCtx, "playback-processor");
@@ -29,10 +52,15 @@ async function connect() {
 
   ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`);
   ws.binaryType = "arraybuffer";
-  ws.onopen = () => setStatus($("mic").classList.contains("muted") ? "muted" : "live");
   ws.onclose = () => disconnect();
   ws.onmessage = ({ data }) => (typeof data === "string" ? handle(JSON.parse(data)) : player.port.postMessage(data, [data]));
-  $("mic").classList.add("on");
+  await new Promise((resolve, reject) => {
+    ws.onopen = resolve;
+    ws.onerror = () => reject(new Error("Could not connect to chat. Please try again."));
+    ws.onclose = () => reject(new Error("Chat closed before connecting. Please try again."));
+  });
+  ws.onclose = () => disconnect();
+  setStatus("chat");
   $("end").hidden = false;
 }
 
@@ -125,13 +153,21 @@ function setStatus(state) {
   $("status").className = `pill ${state}`;
 }
 
-$("text-form").onsubmit = (e) => {
+$("text-form").onsubmit = async (e) => {
   e.preventDefault();
   const text = $("text").value.trim();
-  if (!text || ws?.readyState !== WebSocket.OPEN) return;
-  ws.send(JSON.stringify({ type: "text", text }));
-  turn = null;
-  say("guest", text);
-  turn = null;
-  $("text").value = "";
+  if (!text || sending) return;
+  sending = true;
+  try {
+    await connect();
+    ws.send(JSON.stringify({ type: "text", text }));
+    turn = null;
+    say("guest", text);
+    turn = null;
+    if ($("text").value.trim() === text) $("text").value = "";
+  } catch (e) {
+    showError(e.message);
+  } finally {
+    sending = false;
+  }
 };
