@@ -44,22 +44,32 @@ async def run_agent(bridge: BrowserBridge) -> None:
 
     # === LIVE CODING START ===
     # Connect to the Live API
-    pass
+    async with client.aio.live.connect(model=settings.model, config=build_live_config(settings, registry)) as session:
 
         async def send_inputs():
             #Send human audio to Gemini
-            pass
+            async for item in bridge.inputs():
+                await session.send_realtime_input(**item)
 
 
         async def answer(tool_call):
             #Call the tool, then send the response to Gemini
-            pass
+            await session.send_tool_response(function_responses=await registry.run(tool_call))
 
         async def receive_replies():
             #In a loop - receive messages from Gemini and take actions
-            pass
+            while True:
+                async for msg in session.receive():
+                    await bridge.play(msg.data)
+                    if msg.server_content and msg.server_content.interrupted:
+                        await bridge.interrupt()
+                    if msg.tool_call:
+                        tg.create_task(answer(msg.tool_call))
+                    await bridge.transcript(msg)
 
 
         #Start the parallel tasks to listen to user and respond
-        pass
+        async with asyncio.TaskGroup() as tg:
+            tg.create_task(send_inputs())
+            tg.create_task(receive_replies())
     # === LIVE CODING END ===
